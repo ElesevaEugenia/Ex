@@ -1,0 +1,182 @@
+using System; 
+using System.IO; 
+using System.Collections.Generic; 
+using System.Linq; 
+using System.Text; 
+using System.Threading.Tasks; 
+ 
+namespace sort_project 
+{ 
+ 
+ class Program 
+ { 
+ 
+ // Эта функция генерирует фио человека в зависимости от приданного в нее пола! 
+ private static string randomFioGeneration(string gender,int seed) 
+ { 
+ string fio ; 
+ 
+ // Массивы фамилий, имен и отчеств с помощю которых мы будем генерировать наши фио 
+ //для мужских фио 
+ string[] maleFamilia ={"Авдеев","Яншин","Гусельников","Низов","Сухоруков","Никонов","Килик","Ломадуров","Кариев","Увакин"}; 
+ string[] maleImia = { "Капитон", "Эдуард", "Соломон", "Савелий", "Харитон", "Ипполит", "Гавриил", "Гаврила", "Виссарион", "Мир" }; 
+ string[] maleOtchestvo = { "Георгиевич", "Леонтиевич", "Брониславович", "Филиппович", "Потапович", "Брониславович", "Ильевич", "Родионович", "Сергеевич", "Фомевич" }; 
+ 
+ //для женских 
+ string[] femaleFamilia = { "Митасова", "Матвеева", "Яна", "Ягода", "Ямалетдинова", "Комягина", "Курневича", "Черенчикова", "Тихонова", "Якубова" }; 
+ string[] femaleImia = { "Римма", "Оксана", "Мария", "Вероника", "Доминика", "Наталия", "Светлана", "Агата", "Надежда", "Виктория" }; 
+ string[] femaleOtshestvo = { "Карповна", "Иларионовна", "Евгениевна", "Якововна", "Брониславовна", "Брониславовна", "Андрияновна", "Владленовна", "Захаровна", "Данилевна" }; 
+ 
+ Random random = new Random(seed); 
+ // Следующая функция принимает массивы фамилий, имен и отчеств и рандомно составляет ФИО 
+ string randomName(string[] familia, string[] imia, string[] otshestvo) 
+ { 
+ string name = ""; 
+ int randomIndex; 
+ 
+ 
+ // мы составляем ФИО 
+ 
+ randomIndex = random.Next(0,10); 
+ name += (familia[randomIndex] + " "); 
+ 
+ randomIndex = random.Next(0,10); 
+ name += (imia[randomIndex] + " "); 
+ 
+ randomIndex = random.Next(0,10); 
+ name += otshestvo[randomIndex]; 
+ 
+ 
+ return name; //Возвращаем составленное ФИО 
+ 
+ } 
+ 
+ if(gender == "M") 
+ {// Если мужской то сгенерировать фио используя "мужские" массивы 
+ fio = randomName(maleFamilia,maleImia,maleOtchestvo); 
+ } 
+ else 
+ {// Если женской то сгенерировать фио используя "женские" массивы 
+ fio = randomName(femaleFamilia, femaleImia, femaleOtshestvo); 
+ } 
+ 
+ return fio; 
+ } 
+ 
+ 
+ public class StudentList 
+ { 
+ public string[] fio; 
+ public int[] marks; 
+ 
+ public StudentList() { } 
+ //Мы создаем список number студентов 
+ public StudentList(int number) 
+ { 
+ //Массивы длины number 
+ fio = new string[number]; 
+ marks = new int[number]; 
+ 
+ int int_gender;// Примет значения 0, 1 
+ string gender; // равно "м" если int_gender = 0, и "F" если иначе 
+ Random random = new Random(); 
+ 
+ 
+ for(int i=0; i<number; i++) 
+ { 
+ int_gender = random.Next(2); 
+ gender = (int_gender == 0) ? "M" : "F"; 
+ // ФИО студента 
+ fio[i] = randomFioGeneration(gender, (i+1)*1000); 
+ //его оценка от 31 до 100 
+ marks[i] = random.Next(31, 101); 
+ 
+ } 
+ } 
+ } 
+ 
+ 
+ // генерация файла с всеми ФИО и оценками 
+ public static void createFile(StudentList list, string fileName) 
+ { 
+ int length = list.fio.Length; 
+ string filePath = @"C:\Users\patat\Desktop\Programming\C sharp programming\"+fileName; 
+ using (StreamWriter sw = new StreamWriter(filePath, true)) 
+ { 
+ for (int i=0; i<length; i++) 
+ { 
+ sw.WriteLine(list.fio[i] + " " + list.marks[i]); 
+ } 
+ } 
+ } 
+ 
+ 
+ // Анализ список студентов 
+ // Следующая функция выделяет самых успевающих и самых отстающих и возвращает количество самых успевающих 
+ public static int Analysis(StudentList list) 
+ { 
+ int length = list.fio.Length; //количество студентов 
+ int excellent = 0;//количество самых успевающих 
+ 
+ 
+ Array.Sort(list.marks,list.fio);//Отсортируем 
+ 
+ // считаем сколько самых успевающих 
+ int i = length - 1; 
+ while(list.marks[i]>89) 
+ { 
+ excellent++; 
+ i--; 
+ } 
+ 
+ return excellent; //возвращает количество самых успевающих 
+ } 
+ 
+ 
+ // Печатает выделенный список 
+ public static void consolePrint(StudentList list) 
+ { 
+ int length = list.fio.Length; //количество студентов 
+ int excellent = Analysis(list); //выделять самых успевающих и самых отстающих и возвращать количество самых успевающих 
+ 
+ //Вывод самых успевающих 
+ Console.WriteLine(); 
+ Console.WriteLine("Самые успевающие"); 
+ Console.WriteLine(); 
+ 
+ for(int i=length-1; i>=length-excellent; i--) 
+ { 
+ Console.WriteLine("{0} {1}", list.fio[i], list.marks[i]); 
+ } 
+ 
+ 
+ //Вывод самых отстающих 
+ Console.WriteLine(); 
+ Console.WriteLine("Самые отстающие"); 
+ Console.WriteLine(); 
+ 
+ for (int i = length - excellent-1; i >-1; i--) 
+ { 
+ Console.WriteLine("{0} {1}", list.fio[i], list.marks[i]); 
+ } 
+ } 
+ 
+ 
+ public static void Main() 
+ { 
+ Console.OutputEncoding = Encoding.UTF8; 
+ 
+ // Сгенерировать студентов 
+ StudentList mySpecialList = new StudentList(100); 
+ 
+ //Сгенерировать файл 
+ createFile(mySpecialList, "New list.txt"); 
+ 
+ //вывод на консол 
+ consolePrint(mySpecialList); 
+ 
+ Console.ReadKey(); 
+ } 
+ 
+ }
+} 
